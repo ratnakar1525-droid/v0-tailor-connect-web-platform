@@ -7,14 +7,16 @@ import { Calendar } from "@/components/ui/calendar"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { mockTailors } from "@/lib/mock-data"
-import { saveOrder } from "@/lib/storage"
+import { saveOrderFor } from "@/lib/storage"
 import type { Order } from "@/lib/types"
+import { useAuth } from "@/hooks/use-auth"
 
 const times = ["09:00", "10:30", "12:00", "14:00", "15:30", "17:00"]
 
 export default function BookPage() {
   const params = useSearchParams()
   const router = useRouter()
+  const { user } = useAuth()
   const [tailorId, setTailorId] = useState<string | null>(params.get("tailorId"))
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [time, setTime] = useState<string>("10:30")
@@ -28,6 +30,10 @@ export default function BookPage() {
   }, [tailorId, tailor])
 
   function confirm() {
+    if (!user) {
+      router.push("/login")
+      return
+    }
     if (!date || !tailor) return
     const order: Order = {
       id: crypto.randomUUID(),
@@ -39,12 +45,32 @@ export default function BookPage() {
       total: tailor.priceFrom,
       createdAt: new Date().toISOString(),
     }
-    saveOrder(order)
+    saveOrderFor(user.id, order)
     router.push("/dashboard/customer")
   }
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 grid gap-8 md:grid-cols-2">
+      {!user && (
+        <div className="md:col-span-2">
+          <Card>
+            <CardHeader>
+              <h3 className="font-medium">Please sign in</h3>
+            </CardHeader>
+            <CardContent className="text-sm text-muted-foreground">
+              You need an account to book an appointment.{" "}
+              <a href="/login" className="underline underline-offset-4">
+                Sign in
+              </a>{" "}
+              or{" "}
+              <a href="/register" className="underline underline-offset-4">
+                create an account
+              </a>
+              .
+            </CardContent>
+          </Card>
+        </div>
+      )}
       <section className="space-y-4">
         <h1 className="text-2xl font-semibold">Book appointment</h1>
         <div className="space-y-2">
@@ -92,7 +118,9 @@ export default function BookPage() {
             placeholder="Anything your tailor should know..."
           />
         </div>
-        <Button onClick={confirm}>Confirm booking</Button>
+        <Button onClick={confirm} disabled={!user}>
+          Confirm booking
+        </Button>
       </section>
 
       <section>

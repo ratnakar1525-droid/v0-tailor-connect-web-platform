@@ -9,8 +9,9 @@ import { SiteFooter } from "@/components/site-footer"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
+  title: "TailorConnect — Custom clothing made effortless",
+  description:
+    "Discover local tailors, design your outfit, save measurements, and book fittings — all in one seamless experience.",
   generator: "v0.app",
 }
 

@@ -4,9 +4,11 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/hooks/use-auth"
 
 export function SiteHeader() {
   const pathname = usePathname()
+  const { user, logout } = useAuth()
   const nav = [
     { href: "/", label: "Home" },
     { href: "/tailors", label: "Find Tailors" },
@@ -37,20 +39,28 @@ export function SiteHeader() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <Link href="/dashboard/customer">
-              <Button variant="ghost" className="hidden sm:inline-flex">
-                Customer
-              </Button>
-            </Link>
-            <Link href="/dashboard/tailor">
-              <Button>Tailor</Button>
-            </Link>
-            <Link href="/login" className="hidden md:inline-flex">
-              <Button variant="ghost">Login</Button>
-            </Link>
-            <Link href="/register" className="hidden md:inline-flex">
-              <Button variant="outline">Register</Button>
-            </Link>
+            {user ? (
+              <>
+                <Link href={user.role === "tailor" ? "/dashboard/tailor" : "/dashboard/customer"}>
+                  <Button variant="ghost" className="hidden sm:inline-flex">
+                    {user.role === "tailor" ? "Tailor Dashboard" : "My Orders"}
+                  </Button>
+                </Link>
+                <span className="hidden md:inline text-sm text-muted-foreground">{user.name}</span>
+                <Button onClick={logout} variant="outline">
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="hidden md:inline-flex">
+                  <Button variant="ghost">Login</Button>
+                </Link>
+                <Link href="/register" className="hidden md:inline-flex">
+                  <Button variant="outline">Register</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

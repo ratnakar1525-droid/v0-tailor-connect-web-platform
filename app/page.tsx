@@ -38,7 +38,13 @@ export default function HomePage() {
           </ul>
         </div>
         <div className="relative aspect-[4/3] rounded-xl overflow-hidden border">
-          <Image src="/public/placeholder.jpg" alt="Stylish tailor studio" fill className="object-cover" />
+          <Image
+            src="/tailor-studio-interior.jpg"
+            alt="Tailor studio with fabrics and fitting area"
+            width={800}
+            height={600}
+            className="h-full w-full object-cover"
+          />
         </div>
       </section>
 
